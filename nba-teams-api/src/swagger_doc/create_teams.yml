@@ -1,0 +1,46 @@
+tags:
+  - Teams
+parameters:
+  - name: body
+    in: body
+    required: true
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Example Name
+        city:
+          type: string
+          example: Example Description
+
+responses:
+  201:
+    description: "Returns a list of NBA Teams."
+    schema:
+      type: object
+      properties:
+        team:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+            city:
+              type: string
+  400:
+    description: Failed to Create New Team
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+      examples:
+        response1:
+          value:
+            message: Error message 1
+        response2:
+          value:
+            message: Error message 2

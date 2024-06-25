@@ -1,0 +1,25 @@
+Get List of NBA Team
+---
+tags:
+  - Teams
+
+responses:
+  200:
+    description: "Returns a list of NBA Teams."
+    schema:
+      type: object
+      properties:
+        teams:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              name:
+                type: string
+              city:
+                type: string
+  400:
+    description: There are no registered teams yet
