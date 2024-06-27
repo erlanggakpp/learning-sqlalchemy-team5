@@ -6,9 +6,10 @@ from functools import wraps
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from connectors.mysql_connector import connection
 from models import TeamModel
+from flask_login import login_required, current_user
 from sqlalchemy.orm import sessionmaker, joinedload
 team_bp = Blueprint('teams', __name__)
-
+from middleware.auth import authenticator_and_authorization
 class CustomException(Exception):
     def __init__(self, message, error_code):
         self.message = message
@@ -24,9 +25,23 @@ def handle_custom_exceptions(f):
             return jsonify({"message": e.message}), e.error_code
     return decorated_function
 
+# def authenticator_and_authorization(role):
+#     def wrapper(f):
+#         @wraps(f)
+#         def decorated_function(*args, **kwargs):
+#             print(current_user.is_authenticated)
+#             if current_user.is_authenticated == False:
+#                 raise CustomException("Please Login first!", 403)
+#             if current_user.role != role:
+#                 raise CustomException("You are not allowed to access this", 403)
+#             return f(*args, **kwargs)
+#         return decorated_function
+#     return wrapper
+
 @team_bp.get("/")
 @swag_from(os.path.join(current_dir, '..', 'swagger_doc', 'get_teams.yml'))
 @handle_custom_exceptions
+@authenticator_and_authorization("Admin")
 def get_teams():
     Session = sessionmaker(connection)
     teams = []
@@ -37,7 +52,7 @@ def get_teams():
         if name: 
             query = query.filter(TeamModel.name.ilike(f'%{name}%'))
         if city: 
-            query = query.filter(TeamModel.city.ilike(f'%{name}%'))
+            query = query.filter(TeamModel.city.ilike(f'%{city}%'))
         teams = query.all()
     if len(teams) == 0:
         raise CustomException("There are no registered teams yet", 400)
@@ -82,7 +97,6 @@ def edit_specific_team(id):
     try:
         with Session() as s:
             target_team = s.query(TeamModel).get(id)
-            print(target_team)
             if target_team is None:
                 raise CustomException(f"There are no registered teams with ID: {id}", 400)
             for key, value in data.items():
