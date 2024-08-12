@@ -5,7 +5,6 @@
         "buildCommand": "python -m pip install virtualenv && virtualenv /opt/venv"
     },
     "deploy": {
-        "startCommand": "gunicorn app:app",
         "restartPolicyType": "ON_FAILURE",
         "restartPolicyMaxRetries": 10
     }
